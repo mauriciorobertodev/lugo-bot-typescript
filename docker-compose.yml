@@ -1,0 +1,323 @@
+version: "3.9"
+services:
+    game_server:
+        container_name: SERVER
+        image: lugobots/server:${SERVER_VERSION:-latest}
+        command: play --dev-mode --timer-mode=wait --quiet
+        ports:
+            - "5000:5000"
+            - "8080:8080"
+        healthcheck:
+            test: ["CMD", "grpc-health-probe", "-addr=game_server:5000"]
+            interval: 2s
+            timeout: 5s
+            retries: 100
+            start_period: 10s
+    player_01:
+        container_name: PLAYER-01
+        image: node:20-alpine
+        working_dir: /app
+        command: npm run start
+        network_mode: "host"
+        volumes:
+            - "./:/app"
+        environment:
+            - BOT_NUMBER=1
+            - BOT_TEAM=${PLAYER_SIDE:-home}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    player_02:
+        container_name: PLAYER-02
+        image: node:20-alpine
+        working_dir: /app
+        command: npm run start
+        network_mode: "host"
+        volumes:
+            - "./:/app"
+        environment:
+            - BOT_NUMBER=2
+            - BOT_TEAM=${PLAYER_SIDE:-home}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    player_03:
+        container_name: PLAYER-03
+        image: node:20-alpine
+        working_dir: /app
+        command: npm run start
+        network_mode: "host"
+        volumes:
+            - "./:/app"
+        environment:
+            - BOT_NUMBER=3
+            - BOT_TEAM=${PLAYER_SIDE:-home}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    player_04:
+        container_name: PLAYER-04
+        image: node:20-alpine
+        working_dir: /app
+        command: npm run start
+        network_mode: "host"
+        volumes:
+            - "./:/app"
+        environment:
+            - BOT_NUMBER=4
+            - BOT_TEAM=${PLAYER_SIDE:-home}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    player_05:
+        container_name: PLAYER-05
+        image: node:20-alpine
+        working_dir: /app
+        command: npm run start
+        network_mode: "host"
+        volumes:
+            - "./:/app"
+        environment:
+            - BOT_NUMBER=5
+            - BOT_TEAM=${PLAYER_SIDE:-home}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    player_06:
+        container_name: PLAYER-06
+        image: node:20-alpine
+        working_dir: /app
+        command: npm run start
+        network_mode: "host"
+        volumes:
+            - "./:/app"
+        environment:
+            - BOT_NUMBER=6
+            - BOT_TEAM=${PLAYER_SIDE:-home}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    player_07:
+        container_name: PLAYER-07
+        image: node:20-alpine
+        working_dir: /app
+        command: npm run start
+        network_mode: "host"
+        volumes:
+            - "./:/app"
+        environment:
+            - BOT_NUMBER=7
+            - BOT_TEAM=${PLAYER_SIDE:-home}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    player_08:
+        container_name: PLAYER-08
+        image: node:20-alpine
+        working_dir: /app
+        command: npm run start
+        network_mode: "host"
+        volumes:
+            - "./:/app"
+        environment:
+            - BOT_NUMBER=8
+            - BOT_TEAM=${PLAYER_SIDE:-home}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    player_09:
+        container_name: PLAYER-09
+        image: node:20-alpine
+        working_dir: /app
+        command: npm run start
+        network_mode: "host"
+        volumes:
+            - "./:/app"
+        environment:
+            - BOT_NUMBER=9
+            - BOT_TEAM=${PLAYER_SIDE:-home}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    player_10:
+        container_name: PLAYER-10
+        image: node:20-alpine
+        working_dir: /app
+        command: npm run start
+        network_mode: "host"
+        volumes:
+            - "./:/app"
+        environment:
+            - BOT_NUMBER=10
+            - BOT_TEAM=${PLAYER_SIDE:-home}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    player_11:
+        container_name: PLAYER-11
+        image: node:20-alpine
+        working_dir: /app
+        command: npm run start
+        network_mode: "host"
+        volumes:
+            - "./:/app"
+        environment:
+            - BOT_NUMBER=11
+            - BOT_TEAM=${PLAYER_SIDE:-home}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    opponent_01:
+        container_name: OPPONENT-01
+        image: ${OPPONENT_BOT:-lugobots/the-dummies-go:latest}
+        network_mode: "host"
+        environment:
+            - BOT_NUMBER=1
+            - BOT_TEAM=${OPPONENT_SIDE:-away}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    # opponent_02:
+    #     container_name: OPPONENT-02
+    #     image: ${OPPONENT_BOT:-lugobots/the-dummies-go:latest}
+    #     network_mode: "host"
+    #     environment:
+    #         - BOT_NUMBER=2
+    #         - BOT_TEAM=${OPPONENT_SIDE:-away}
+    #     depends_on:
+    #         game_server:
+    #             condition: service_healthy
+    #     env_file:
+    #         - .env
+    opponent_03:
+        container_name: OPPONENT-03
+        image: ${OPPONENT_BOT:-lugobots/the-dummies-go:latest}
+        network_mode: "host"
+        environment:
+            - BOT_NUMBER=3
+            - BOT_TEAM=${OPPONENT_SIDE:-away}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    opponent_04:
+        container_name: OPPONENT-04
+        image: ${OPPONENT_BOT:-lugobots/the-dummies-go:latest}
+        network_mode: "host"
+        environment:
+            - BOT_NUMBER=4
+            - BOT_TEAM=${OPPONENT_SIDE:-away}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    opponent_05:
+        container_name: OPPONENT-05
+        image: ${OPPONENT_BOT:-lugobots/the-dummies-go:latest}
+        network_mode: "host"
+        environment:
+            - BOT_NUMBER=5
+            - BOT_TEAM=${OPPONENT_SIDE:-away}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    opponent_06:
+        container_name: OPPONENT-06
+        image: ${OPPONENT_BOT:-lugobots/the-dummies-go:latest}
+        network_mode: "host"
+        environment:
+            - BOT_NUMBER=6
+            - BOT_TEAM=${OPPONENT_SIDE:-away}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    opponent_07:
+        container_name: OPPONENT-07
+        image: ${OPPONENT_BOT:-lugobots/the-dummies-go:latest}
+        network_mode: "host"
+        environment:
+            - BOT_NUMBER=7
+            - BOT_TEAM=${OPPONENT_SIDE:-away}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    opponent_08:
+        container_name: OPPONENT-08
+        image: ${OPPONENT_BOT:-lugobots/the-dummies-go:latest}
+        network_mode: "host"
+        environment:
+            - BOT_NUMBER=8
+            - BOT_TEAM=${OPPONENT_SIDE:-away}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    opponent_09:
+        container_name: OPPONENT-09
+        image: ${OPPONENT_BOT:-lugobots/the-dummies-go:latest}
+        network_mode: "host"
+        environment:
+            - BOT_NUMBER=9
+            - BOT_TEAM=${OPPONENT_SIDE:-away}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    opponent_10:
+        container_name: OPPONENT-10
+        image: ${OPPONENT_BOT:-lugobots/the-dummies-go:latest}
+        network_mode: "host"
+        environment:
+            - BOT_NUMBER=10
+            - BOT_TEAM=${OPPONENT_SIDE:-away}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
+    opponent_11:
+        container_name: OPPONENT-11
+        image: ${OPPONENT_BOT:-lugobots/the-dummies-go:latest}
+        network_mode: "host"
+        environment:
+            - BOT_NUMBER=11
+            - BOT_TEAM=${OPPONENT_SIDE:-away}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env

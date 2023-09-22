@@ -1,0 +1,44 @@
+{
+    "name": "lugo-bot-typescript",
+    "version": "1.0.0",
+    "description": "",
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "main": "dist/main.js",
+    "scripts": {
+        "start": "node dist/main.js",
+        "play": "clear && tsc && node --env-file .env dist/main.js",
+        "lint": "eslint 'src/**'",
+        "lint:fix": "npm run lint -- --fix",
+        "style:check": "prettier --check 'src/**/*.ts'",
+        "style:fix": "prettier --write 'src/**/*.ts'",
+        "build": "clear && rm -rf dist && tsc",
+        "image:build": "docker build -t $npm_package_name:v$npm_package_version .",
+        "image:push": "npm run docker:login && docker build -t repo.lugobots.dev/$npm_package_name:v$npm_package_version . && docker push repo.lugobots.dev/$npm_package_name:v$npm_package_version",
+        "docker:login": "docker login repo.lugobots.dev",
+        "docker:logout": "docker logout repo.lugobots.dev",
+        "bot:test": "PLAYER_BOT=$npm_package_name:v$npm_package_version docker compose --file test-docker-compose.yml -p tester up",
+        "bot:test:home": "PLAYER_BOT=$npm_package_name:v$npm_package_version MY_SIDE=home OPPONENT_SIDE==away docker compose --file test-docker-compose.yml -p tester up",
+        "bot:test:away": "PLAYER_BOT=$npm_package_name:v$npm_package_version MY_SIDE=away OPPONENT_SIDE==home docker compose --file test-docker-compose.yml -p tester up",
+        "bot:run": "npm run build && docker compose up",
+        "bot:run:home": "npm run build && PLAYER_SIDE=home OPPONENT_SIDE=away docker compose up",
+        "bot:run:away": "npm run build && PLAYER_SIDE=away OPPONENT_SIDE=home docker compose up",
+        "watcher:up": "docker compose -f watcher-compose.yml -p builder up -d",
+        "watcher:down": "docker compose -f watcher-compose.yml -p builder down"
+    },
+    "dependencies": {
+        "@lugobots/lugo4node": "^1.0.1-beta.1"
+    },
+    "devDependencies": {
+        "@types/node": "^20.4.9",
+        "@typescript-eslint/eslint-plugin": "^5.62.0",
+        "@typescript-eslint/parser": "^5.59.6",
+        "eslint": "^8.46.0",
+        "eslint-config-prettier": "^9.0.0",
+        "eslint-plugin-prettier": "^5.0.0",
+        "prettier": "^3.0.1",
+        "tsc-watch": "^5.0.3",
+        "typescript": "^4.9.5"
+    }
+}

@@ -1,0 +1,193 @@
+#!/usr/bin/env bash
+################################################################################
+# Script: Lugo Bot Ts Template - PT-BR
+# Versão: 1.0.0
+# Autor: Mauricio Roberto <mauricio.roberto.dev@gmail.com>
+################################################################################
+
+
+################################################################################
+# Cores                                                                        #
+################################################################################
+RED="\e[31m"
+BLUE="\e[34m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+RESET="\e[0m"
+BOLD="\033[1m"
+
+################################################################################
+# HELP                                                                         #
+################################################################################
+_help() {
+   echo -e "${GREEN}------------- AJUDA -------------"
+   echo
+   echo -e "${BOLD}${BLUE}run${RESET}    - Inicia um jogo entre o bot que está sendo desenvolvido contra a imagem de outro bot, use 'home' ou 'away' para escolher o lado, e após o lado caso deseje o nome da imagem do oponente."
+   echo -e "${BOLD}${BLUE}test${RESET}   - Inicia um jogo entre a imagem do bot que está sendo desenvolvido contra a imagem de outro bot, use 'home' ou 'away' para escolher o lado e após o lado caso deseje o nome da imagem do oponente."
+   echo -e "${BOLD}${BLUE}build${RESET}  - Constrói a imagem do bot sendo desenvoldido você pode passar a versão que deseja buildar e ela ficará como tag"
+   echo -e "${BOLD}${BLUE}watch${RESET}  - Inicia um container que monitora as alterações no código e rebuilda na pasta dist"
+   echo -e "${BOLD}${BLUE}push${RESET}   - Faz login no repositório do Lugo Bots, constrói a imagem e a envia para o respositório"
+   echo -e "${BOLD}${BLUE}login${RESET}  - Faz login no site/repositório lugo bots. ${BOLD}${YELLOW}*etapa necessária antes de enviar a imagem do bot*"
+   echo -e "${BOLD}${BLUE}logout${RESET} - Finaliza a sessão no site/repositório lugo bots."
+   echo -e "${BOLD}${BLUE}help${RESET}   - Exibe todas as opções disponíveis."
+   echo
+}
+
+################################################################################
+# RUN                                                                          #
+################################################################################
+_run() {
+    PLAYER_SIDE=$2
+    OPPONENT_BOT=$3
+
+    # Se nenhum argumento foi passado usamos o lado home como padrão
+    [[ -z $PLAYER_SIDE ]] && echo -e "${GREEN}(padrão) Iniciando com o lado 'home'...${RESET}" && docker compose -f docker-compose.yml up && exit
+
+    # # Se o argumento passado não bate com nenhum lado então retorna uma mensagem de erro
+    [[ $PLAYER_SIDE != "home" && $PLAYER_SIDE != 'away' ]] && echo -e "${RED}Argumento inválido, existem apenas dois lados 'home' e 'away'!${RESET}" && exit
+
+    OPPONENT_SIDE='away'
+    [[ $PLAYER_SIDE == 'away' ]] && OPPONENT_SIDE='home'
+
+   echo -e "${GREEN}Iniciando com o lado '${PLAYER_SIDE}'...${RESET} com ${OPPONENT_BOT}"
+
+   [[ ! -z $OPPONENT_BOT ]] && \
+   OPPONENT_BOT=$OPPONENT_BOT PLAYER_SIDE=$PLAYER_SIDE OPPONENT_SIDE=$OPPONENT_SIDE docker compose -f docker-compose.yml up && exit || \
+   PLAYER_SIDE=$PLAYER_SIDE OPPONENT_SIDE=$OPPONENT_SIDE docker compose -f docker-compose.yml up && exit
+}
+
+################################################################################
+# TEST                                                                          #
+################################################################################
+_test() {
+    BOT_NAME=$(node -p "require('./package.json').name")
+
+    BOT_VERSION=$3
+    SIDE_OR_DOWN=$2
+
+    [[ -z $BOT_VERSION ]] && BOT_VERSION="$(node -p "require('./package.json').version" )"
+
+    BOT_IMAGE="${BOT_NAME}:v${BOT_VERSION}"
+    OPPONENT_BOT=$4
+
+    # Se nenhum argumento foi passado usamos o lado home como padrão
+    [[ -z $SIDE_OR_DOWN ]] && \
+    echo -e "${GREEN}(padrão) Iniciando com o lado 'home', e com a versão ${BOLD}${YELLOW}${BOT_VERSION}${RESET}${GREEN} do bot ...${RESET}" && \
+    PLAYER_BOT=$BOT_IMAGE docker compose -f test-docker-compose.yml up && exit
+
+    # Se o argumento passado não bate com nenhum lado então retorna uma mensagem de erro
+    [[ $SIDE_OR_DOWN != "home" && $SIDE_OR_DOWN != 'away' && $SIDE_OR_DOWN != 'down' ]] && \
+    echo -e "${RED}Argumento inválido, existem apenas dois lados 'home' e 'away', você pode usar 'down' para desativar o teste${RESET}" && exit
+
+    # Se o argumento for down devemos desativar o teste
+    [[ $SIDE_OR_DOWN == "down" ]] && \
+    echo -e "${YELLOW}Desativando teste..." && \
+    docker compose down && \
+    echo -e "${YELLOW}Teste terminado..." && exit
+
+    OPPONENT_SIDE='away'
+    [[ $SIDE_OR_DOWN == "away" ]]  && OPPONENT_SIDE='home'
+
+    # Se o lado home foi passado então o bot do usuário deve jogar do lado home
+    echo -e "${GREEN}Iniciando com o lado '${SIDE_OR_DOWN}', e com a versão ${BOLD}${YELLOW}${BOT_VERSION}${RESET}${GREEN} do bot ...${RESET}" && \
+    [[ ! -z $OPPONENT_BOT ]] && PLAYER_BOT=$BOT_IMAGE OPPONENT_BOT=$OPPONENT_BOT MY_SIDE=$SIDE_OR_DOWN OPPONENT_SIDE=$OPPONENT_SIDE docker compose -f test-docker-compose.yml up && exit || \
+    PLAYER_BOT=$BOT_IMAGE MY_SIDE=$SIDE_OR_DOWN OPPONENT_SIDE=$OPPONENT_SIDE docker compose -f test-docker-compose.yml up && exit
+
+}
+
+################################################################################
+# BUILD                                                                          #
+################################################################################
+_build() {
+    BOT_NAME=$(node -p "require('./package.json').name")
+
+    BOT_VERSION=$2
+    CURRENT_VERSION="$(node -p "require('./package.json').version" )"
+
+    # se o usuário não passou a versão uso a do package.json
+    [[ -z $BOT_VERSION ]] && BOT_VERSION=$CURRENT_VERSION
+
+    # Vamos verificar se a versão está padronizada
+    [[ ! $BOT_VERSION =~ ^[0-9]+.[0-9]+.[0-9]+$ ]] && echo -e "${RED}A versão deve ser algo como ${BOLD}${YELLOW}número.número.número${RESET}${RED}, para padronização" && exit 1
+
+    # Se o usuário está passando uma versão e é diferente da atual em package.json mostra um aviso
+    [[ ! -z $BOT_VERSION ]] && [[ $BOT_VERSION != $CURRENT_VERSION ]] && \
+    echo -e "${YELLOW}***A versão passada é diferente da atual no package.json, caso seja a nova versão atualize o package.json***\n"
+
+    # Definindo o nome da imagem
+    BOT_IMAGE="${BOT_NAME}:v${BOT_VERSION}"
+
+    echo -e "${GREEN}Contruindo a imagem ${BOLD}${YELLOW}${BOT_IMAGE}${RESET} ${GREEN}..."
+
+    docker build -t $BOT_IMAGE .
+}
+
+################################################################################
+# WATCH                                                                      #
+################################################################################
+_watch() {
+    [[ -z $2 ]] && echo -e "${GREEN}Ativando o watcher..." && docker compose -f watcher-compose.yml -p builder  up -d && echo -e "${GREEN}Watcher ativado..." && exit 0
+    [[ ! -z $2 ]] && [[ $2 == 'down' ]] && echo -e "${GREEN}Desativando o watcher..." &&  docker compose -f watcher-compose.yml -p builder down && echo -e "${GREEN}Watcher desativado..." && exit 0
+    [[ ! -z $2 ]] && [[ $2 == 'up' ]] && echo -e "${GREEN}Ativando o watcher..." && docker compose -f watcher-compose.yml -p builder  up -d && echo -e "${GREEN}Watcher ativado..." && exit 0
+    echo -e "Use apenas ${GREEN}'up' ${RESET}para ativar o whatcher ou ${GREEN}'down'${RESET} para desativa-lo...\n" && exit 0
+}
+
+################################################################################
+# LOGIN                                                                          #
+################################################################################
+_login() {
+    echo -e "${GREEN}Iniciando logout no repositório do Lugo Bots... Suas credenciais podem ser exigidas...${RESET}"
+    echo -e "${YELLOW}Caso necessário use seu login e senha do site 'https://beta.lugobots.dev/'${RESET}"
+    docker login repo.lugobots.dev && echo -e "${GREEN}Login realizado com sucesso!" && exit 0 || echo -e "${RED}Erro ao logar" && exit 1
+}
+
+################################################################################
+# LOGOUT                                                                          #
+################################################################################
+_logout() {
+    echo -e "${GREEN}Deslogando do repositório do Lugo Bots${RESET}"
+    docker logout repo.lugobots.dev && exit 0
+}
+
+################################################################################
+# PUSH                                                                      #
+################################################################################
+_push() {
+    echo -e "${GREEN}Iniciando o push para o repositório do Lugo Bots..."
+
+    BOT_NAME=$(node -p "require('./package.json').name")
+    BOT_VERSION="$(node -p "require('./package.json').version" )"
+    BOT_IMAGE="${BOT_NAME}:v${BOT_VERSION}"
+
+    echo -e "${YELLOW}Construindo a imagem... ${BOLD}${BLUE}repo.lugobots.dev/${BOT_IMAGE}${RESET}"
+
+    docker build -t repo.lugobots.dev/$BOT_IMAGE . && echo -e "${GREEN}Imagem construida...${RESET}"
+
+    echo -e "${YELLOW}Iniciando logout no repositório do Lugo Bots... Suas credenciais podem ser exigidas...${RESET}"
+    echo -e "${BOLD}${YELLOW}Caso necessário use seu login e senha do site 'https://beta.lugobots.dev/'${RESET}"
+    docker login repo.lugobots.dev && echo -e "${GREEN}Login realizado com sucesso!${RESET}" || echo -e "${RED}Erro ao logar${RESET}"
+    echo -e "${YELLOW}Enviando a imagem..."
+
+    docker push repo.lugobots.dev/$BOT_IMAGE && echo -e "${GREN}Imagem enviada com sucesso!${RESET}" && exit 0 || echo -e "${RED}Falha ao enviar${RESET}" && exit 1
+}
+
+# Limpa a tela
+clear
+
+# Verifica se tem algum parâmetro, se não tiver mostra ajuda
+[[ $# -eq 0 ]] && _help && exit 1
+
+# Verifica o primeiro parâmetro e chama a funlçao correspondente
+case $1 in
+    run) _run $*;;
+    login) _login;;
+    logout) _logout;;
+    test) _test $*;;
+    build) _build $*;;
+    watch) _watch $*;;
+    push) _push;;
+    help) _help;;
+    *) _help;;
+esac
+
+exit 0
