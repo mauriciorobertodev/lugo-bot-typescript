@@ -1,7 +1,7 @@
 import { MyBot } from "./my_bot";
 import { EnvVarLoader, Mapper, NewClientFromConfig } from "@lugobots/lugo4node";
 import { FIELD_COLS, FIELD_ROWS, INITIAL_POSITIONS } from "./tatic-positions";
-import { PlayerNumber } from "./helpers/types";
+import { PlayerNumber } from "./types";
 
 // we must load the env vars following the standard defined by the game specs because all bots will receive the
 // arguments in the same format (env vars)
