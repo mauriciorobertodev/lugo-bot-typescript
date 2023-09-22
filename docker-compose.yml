@@ -201,18 +201,18 @@ services:
                 condition: service_healthy
         env_file:
             - .env
-    # opponent_02:
-    #     container_name: OPPONENT-02
-    #     image: ${OPPONENT_BOT:-lugobots/the-dummies-go:latest}
-    #     network_mode: "host"
-    #     environment:
-    #         - BOT_NUMBER=2
-    #         - BOT_TEAM=${OPPONENT_SIDE:-away}
-    #     depends_on:
-    #         game_server:
-    #             condition: service_healthy
-    #     env_file:
-    #         - .env
+    opponent_02:
+        container_name: OPPONENT-02
+        image: ${OPPONENT_BOT:-lugobots/the-dummies-go:latest}
+        network_mode: "host"
+        environment:
+            - BOT_NUMBER=2
+            - BOT_TEAM=${OPPONENT_SIDE:-away}
+        depends_on:
+            game_server:
+                condition: service_healthy
+        env_file:
+            - .env
     opponent_03:
         container_name: OPPONENT-03
         image: ${OPPONENT_BOT:-lugobots/the-dummies-go:latest}
