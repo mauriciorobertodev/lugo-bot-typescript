@@ -12,6 +12,6 @@
             "sourceMaps": true,
             "program": "${workspaceFolder}/dist/main.js",
             "envFile": "${workspaceFolder}/.env"
-        }
+        },
     ]
 }
