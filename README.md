@@ -20,6 +20,9 @@
   </a>
 
 </p>
+
+![Alt text](https://raw.githubusercontent.com/mauriciorobertodev/lugo-bot-typescript/main/screenshot.png)
+
 </div>
 
 <br />
