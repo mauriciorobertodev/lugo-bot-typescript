@@ -24,9 +24,9 @@ _help() {
    echo
    echo -e "${BOLD}${BLUE}run${RESET}    - Inicia um jogo entre o bot que está sendo desenvolvido contra a imagem de outro bot, use 'home' ou 'away' para escolher o lado, e após o lado caso deseje o nome da imagem do oponente."
    echo -e "${BOLD}${BLUE}test${RESET}   - Inicia um jogo entre a imagem do bot que está sendo desenvolvido contra a imagem de outro bot, use 'home' ou 'away' para escolher o lado e após o lado caso deseje o nome da imagem do oponente."
-   echo -e "${BOLD}${BLUE}build${RESET}  - Constrói a imagem do bot sendo desenvoldido você pode passar a versão que deseja buildar e ela ficará como tag"
+   echo -e "${BOLD}${BLUE}build${RESET}  - Constrói a imagem do bot sendo desenvolvido você pode passar a versão que deseja buildar e ela ficará como tag"
    echo -e "${BOLD}${BLUE}watch${RESET}  - Inicia um container que monitora as alterações no código e rebuilda na pasta dist"
-   echo -e "${BOLD}${BLUE}push${RESET}   - Faz login no repositório do Lugo Bots, constrói a imagem e a envia para o respositório"
+   echo -e "${BOLD}${BLUE}push${RESET}   - Faz login no repositório do Lugo Bots, constrói a imagem e a envia para o repositório"
    echo -e "${BOLD}${BLUE}login${RESET}  - Faz login no site/repositório lugo bots. ${BOLD}${YELLOW}*etapa necessária antes de enviar a imagem do bot*"
    echo -e "${BOLD}${BLUE}logout${RESET} - Finaliza a sessão no site/repositório lugo bots."
    echo -e "${BOLD}${BLUE}help${RESET}   - Exibe todas as opções disponíveis."
