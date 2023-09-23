@@ -41,7 +41,7 @@ _run() {
     OPPONENT_BOT=$3
 
     # Se nenhum argumento foi passado usamos o lado home como padrão
-    [[ -z $PLAYER_SIDE ]] && echo -e "${GREEN}(padrão) Iniciando com o lado 'home'...${RESET}" && docker compose -f docker-compose.yml up && exit
+    [[ -z $PLAYER_SIDE ]] && echo -e "${GREEN}(padrão) Iniciando com a configuração padrão ou as configurações definidas em .env...${RESET}" && docker compose -f docker-compose.yml up && exit
 
     # # Se o argumento passado não bate com nenhum lado então retorna uma mensagem de erro
     [[ $PLAYER_SIDE != "home" && $PLAYER_SIDE != 'away' ]] && echo -e "${RED}Argumento inválido, existem apenas dois lados 'home' e 'away'!${RESET}" && exit
@@ -72,7 +72,7 @@ _test() {
 
     # Se nenhum argumento foi passado usamos o lado home como padrão
     [[ -z $SIDE_OR_DOWN ]] && \
-    echo -e "${GREEN}(padrão) Iniciando com o lado 'home', e com a versão ${BOLD}${YELLOW}${BOT_VERSION}${RESET}${GREEN} do bot ...${RESET}" && \
+    echo -e "${GREEN}(padrão) Iniciando com a configuração padrão ou as configurações definidas em .env, e com a versão ${BOLD}${YELLOW}${BOT_VERSION}${RESET}${GREEN} do bot ...${RESET}" && \
     PLAYER_BOT=$BOT_IMAGE docker compose -f test-docker-compose.yml up && exit
 
     # Se o argumento passado não bate com nenhum lado então retorna uma mensagem de erro
@@ -92,7 +92,6 @@ _test() {
     echo -e "${GREEN}Iniciando com o lado '${SIDE_OR_DOWN}', e com a versão ${BOLD}${YELLOW}${BOT_VERSION}${RESET}${GREEN} do bot ...${RESET}" && \
     [[ ! -z $OPPONENT_BOT ]] && PLAYER_BOT=$BOT_IMAGE OPPONENT_BOT=$OPPONENT_BOT MY_SIDE=$SIDE_OR_DOWN OPPONENT_SIDE=$OPPONENT_SIDE docker compose -f test-docker-compose.yml up && exit || \
     PLAYER_BOT=$BOT_IMAGE MY_SIDE=$SIDE_OR_DOWN OPPONENT_SIDE=$OPPONENT_SIDE docker compose -f test-docker-compose.yml up && exit
-
 }
 
 ################################################################################
