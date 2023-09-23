@@ -7,8 +7,9 @@
     "license": "ISC",
     "main": "dist/main.js",
     "scripts": {
-        "start": "node dist/main.js",
-        "play": "clear && tsc && node --env-file .env dist/main.js",
+        "start": "clear && node dist/main.js",
+        "play": "clear && node --env-file .env dist/main.js",
+        "build": "clear && tsc",
         "lint:check": "eslint 'src/**'",
         "lint:fix": "npm run lint -- --fix",
         "style:check": "prettier --check 'src/**/*.ts'",
@@ -17,7 +18,7 @@
         "watcher:down": "docker compose -f watcher-compose.yml -p builder down"
     },
     "dependencies": {
-        "@lugobots/lugo4node": "^1.0.1-beta.1"
+        "@lugobots/lugo4node": "^1.0.1-beta.3"
     },
     "devDependencies": {
         "@types/node": "^20.4.9",
